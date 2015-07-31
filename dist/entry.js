@@ -3079,6 +3079,31 @@ Entry.init = function() {
 };
 Entry.loadProject = function(b) {
 };
+Entry.Script = function() {
+  Entry.Model.generateObserve(this);
+  this.scripts = [];
+};
+(function(b) {
+  b.insert = function() {
+  };
+  b.move = function() {
+  };
+  b.remove = function() {
+  };
+  b.fromJSON = function(a) {
+    "string" == typeof a && (a = JSON.parse(a));
+    a instanceof Array && (this.scripts = a);
+  };
+  b.toJSON = function() {
+    return JSON.stringify(this.scripts);
+  };
+  b.fromXml = function() {
+  };
+  b.toXml = function() {
+  };
+  b.clear = function() {
+  };
+})(Entry.Script.prototype);
 Entry.STATIC = {OBJECT:0, ENTITY:1, SPRITE:2, SOUND:3, VARIABLE:4, FUNCTION:5, SCENE:6, MESSAGE:7};
 Entry.Entity = function() {
   Entry.Model(this);
