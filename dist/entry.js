@@ -74,7 +74,7 @@ var Entry = {events_:{}, block:{}, TEXT_ALIGN_CENTER:0, TEXT_ALIGN_LEFT:1, TEXT_
 }, addActivity:function(a) {
   Entry.stateManager && Entry.stateManager.addActivity(a);
 }, startActivityLogging:function() {
-  Entry.reporter && Entry.reporter.start(Entry.projectId, window.user._id, Entry.startTime);
+  Entry.reporter && Entry.reporter.start(Entry.projectId, window.user ? window.user._id : null, Entry.startTime);
 }, getActivityLog:function() {
   var a = {};
   Entry.stateManager && (a.activityLog = Entry.stateManager.activityLog_);
@@ -5457,7 +5457,7 @@ Entry.EntityObject.prototype.applyFilter = function() {
   e.adjustColor(0, 0, 0, b.hue);
   e = new createjs.ColorMatrixFilter(e);
   c.push(e);
-  var e = 3.6 * b.hsv, f = Math.acos(-1), f = e * f / 180, e = Math.cos(f), f = Math.sin(f), e = [e, f, 0, 0, 0, -1 * f, e, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], e = (new createjs.ColorMatrix).concat(e), e = new createjs.ColorMatrixFilter(e);
+  var f = 3.6 * b.hsv * Math.acos(-1) / 180, e = Math.cos(f), f = Math.sin(f), e = [e, f, 0, 0, 0, -1 * f, e, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], e = (new createjs.ColorMatrix).concat(e), e = new createjs.ColorMatrixFilter(e);
   c.push(e);
   a.alpha = b.alpha = d(b.alpha, 0, 1);
   a.filters = c;
@@ -5778,8 +5778,12 @@ Entry.initialize_ = function() {
   this.toast = new Entry.Toast;
   this.hw && this.hw.closeConnection();
   this.hw = new Entry.HW;
-  if ("workspace" == this.type || "phone" == this.type) {
-    this.reporter = new Entry.Reporter;
+  if (Entry.enableActivityLogging) {
+    this.reporter = new Entry.Reporter(!1);
+  } else {
+    if ("workspace" == this.type || "phone" == this.type) {
+      this.reporter = new Entry.Reporter(!0);
+    }
   }
   this.initContextMenu();
 };
@@ -8784,24 +8788,26 @@ Entry.Popup.prototype.resize = function(a) {
   a.style.width = String(b) + "px";
   a.style.height = String(c + 35) + "px";
 };
-Entry.Reporter = function() {
+Entry.Reporter = function(a) {
   this.userId;
   this.projectId;
+  this.isRealTime = a;
+  this.activities = [];
 };
 Entry.Reporter.prototype.start = function(a, b, c) {
-  -1 < window.location.href.indexOf("localhost") ? this.io = io("localhost:7000") : this.io = io("play04.play-entry.com:7000");
-  this.io.emit("activity", {message:"start", userId:b, projectId:a, time:c});
+  this.isRealTime && (-1 < window.location.href.indexOf("localhost") ? this.io = io("localhost:7000") : this.io = io("play04.play-entry.com:7000"), this.io.emit("activity", {message:"start", userId:b, projectId:a, time:c}));
   this.userId = b;
   this.projectId = a;
 };
 Entry.Reporter.prototype.report = function(a) {
-  if (this.io) {
+  if (!this.isRealTime || this.io) {
     var b = [], c;
     for (c in a.params) {
       var d = a.params[c];
       "object" !== typeof d ? b.push(d) : d.id && b.push(d.id);
     }
-    this.io.emit("activity", {message:a.message, userId:this.userId, projectId:this.projectId, time:a.time, params:b});
+    a = {message:a.message, userId:this.userId, projectId:this.projectId, time:a.time, params:b};
+    this.isRealTime ? this.io.emit("activity", a) : this.activities.push(a);
   }
 };
 Entry.Scene = function() {
