@@ -401,6 +401,15 @@ Blockly.Blocks.set_brush_color_effect = {
 };
 
 Entry.block.set_brush_color_effect = function (sprite, scrupt) {
+    var amount = script.getField("VALUE", script);
+    if (!sprite.brush) {
+        Entry.setBasicBrush(sprite);
+        sprite.brush.stop = true;
+    }
+
+    if (sprite.shapa) {
+    }
+
 
     return script.callReturn();
 };
@@ -413,7 +422,7 @@ Blockly.Blocks.change_brush_color_effect = {
     this.appendValueInput("VALUE")
         .setCheck(['Number', 'Boolean']);
     this.appendDummyInput()
-        .appendField(Lang.Blocks.BRUSH_set_color_effect_2)
+        .appendField(Lang.Blocks.BRUSH_change_color_effect_2)
         .appendField(new Blockly.FieldIcon('/img/assets/block_icon/brush_03.png', '*'));
     this.setInputsInline(true);
     this.setPreviousStatement(true);
@@ -421,7 +430,7 @@ Blockly.Blocks.change_brush_color_effect = {
   }
 };
 
-Entry.block.set_brush_color_effect = function (sprite, scrupt) {
+Entry.block.change_brush_color_effect = function (sprite, scrupt) {
 
     return script.callReturn();
 };
