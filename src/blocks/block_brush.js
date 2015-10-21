@@ -400,17 +400,23 @@ Blockly.Blocks.set_brush_color_effect = {
   }
 };
 
-Entry.block.set_brush_color_effect = function (sprite, scrupt) {
-    var amount = script.getField("VALUE", script);
+Entry.block.set_brush_color_effect = function (sprite, script) {
+    var amount = script.getNumberValue("VALUE", script);
     if (!sprite.brush) {
         Entry.setBasicBrush(sprite);
         sprite.brush.stop = true;
     }
 
-    if (sprite.shapa) {
-    }
+    if (!sprite.brush.effect)
+        sprite.brush.effect = 0;
 
+    var rgb = sprite.brush.rgb;
+    sprite.brush.endStroke();
+    sprite.brush.beginStroke("rgba("+rgb.r+","+rgb.g+","+rgb.b+","+(sprite.brush.opacity/100)+")");
+    sprite.brush.moveTo(sprite.getX(), sprite.getY()*-1);
 
+    sprite.brush.effect = amount;
+    sprite.applyBrushFilter();
     return script.callReturn();
 };
 
@@ -430,7 +436,30 @@ Blockly.Blocks.change_brush_color_effect = {
   }
 };
 
-Entry.block.change_brush_color_effect = function (sprite, scrupt) {
+Entry.block.change_brush_color_effect = function (sprite, script) {
+    var amount = script.getNumberValue("VALUE", script);
+    if (!sprite.brush) {
+        Entry.setBasicBrush(sprite);
+        sprite.brush.stop = true;
+    }
+
+    if (!sprite.brush.effect)
+        sprite.brush.effect = 0;
+
+    sprite.brush.effect += amount;
+
+    if (sprite.brush) {
+        sprite.brush.endStroke();
+
+        var matrix = Entry.getMatrixValue(sprite.brush.effect);
+        var rgb = Entry.calcColorMatrix(sprite.brush.rgb, matrix);
+
+        sprite.brush.beginStroke("rgba("+rgb.r+","+rgb.g+","+rgb.b+","+(sprite.brush.opacity/100)+")");
+        sprite.brush.moveTo(sprite.getX(), sprite.getY()*-1);
+
+        //sprite.brush.rgb = rgb;
+        //sprite.applyBrushFilter();
+    }
 
     return script.callReturn();
 };

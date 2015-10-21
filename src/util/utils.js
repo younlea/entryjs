@@ -666,3 +666,69 @@ Entry.isEmpty = function(obj) {
 
     return true;
 }
+
+Entry.getMatrixValue = function(hsv) {
+    var matrixValue = [
+        1, 0, 0, 0, 0,
+        0, 1, 0, 0, 0,
+        0, 0, 1, 0, 0,
+        0, 0, 0, 1, 0,
+        0, 0, 0, 0, 1
+    ];
+
+    var degrees = hsv*3.6;
+    var r = (degrees*3) * Math.PI / 180;
+    var cosVal = Math.cos(r);
+    var sinVal = Math.sin(r);
+
+    var v = Math.abs(hsv/100);
+    if (v>1) {
+        v = v-Math.floor(v);
+    }
+
+    if (v > 0 && v <= 0.33) {
+        var matrixValue = [
+            1, 0, 0, 0, 0,
+            0, cosVal, sinVal, 0, 0,
+            0, -1*sinVal, cosVal, 0, 0,
+            0, 0, 0, 1, 0,
+            0, 0, 0, 0, 1
+        ];
+    } else if (v <= 0.66) {
+        var matrixValue = [
+            cosVal, 0, sinVal, 0, 0,
+            0, 1, 0, 0, 0,
+            sinVal, 0, cosVal, 0, 0,
+            0, 0, 0, 1, 0,
+            0, 0, 0, 0, 1
+        ];
+    } else if (v <= 0.99) {
+        var matrixValue = [
+            cosVal, sinVal, 0, 0, 0,
+            -1*sinVal, cosVal, 0, 0, 0,
+            0, 0, 1, 0, 0,
+            0, 0, 0, 1, 0,
+            0, 0, 0, 0, 1
+        ];
+    }
+
+    return matrixValue;
+};
+
+Entry.calcColorMatrix = function(rgb, m) {
+    var r=rgb.r, g=rgb.g, b=rgb.b;
+    var _r,_g,_b,_a;
+    /*
+    _r = r*m[0]+g*m[1]+b*m[2]+m[3];
+    _g = r*m[5]+g*m[6]+b*m[7]+m[8];
+    _b = r*m[10]+g*m[11]+b*m[12]+m[13];
+    */
+    _r = r*m[0]+g*m[5]+b*m[10]+m[15];
+    _g = r*m[1]+g*m[6]+b*m[11]+m[16];
+    _b = r*m[2]+g*m[7]+b*m[12]+m[17];
+
+    return {r: Math.round(Math.abs(_r)),
+            g: Math.round(Math.abs(_g)),
+            b: Math.round(Math.abs(_b))};
+}
+

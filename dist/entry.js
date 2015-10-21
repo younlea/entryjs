@@ -673,7 +673,16 @@ Blockly.Blocks.set_brush_color_effect = {init:function() {
   this.setNextStatement(!0);
 }};
 Entry.block.set_brush_color_effect = function(a, b) {
-  return script.callReturn();
+  var c = b.getNumberValue("VALUE", b);
+  a.brush || (Entry.setBasicBrush(a), a.brush.stop = !0);
+  a.brush.effect || (a.brush.effect = 0);
+  var d = a.brush.rgb;
+  a.brush.endStroke();
+  a.brush.beginStroke("rgba(" + d.r + "," + d.g + "," + d.b + "," + a.brush.opacity / 100 + ")");
+  a.brush.moveTo(a.getX(), -1 * a.getY());
+  a.brush.effect = c;
+  a.applyBrushFilter();
+  return b.callReturn();
 };
 Blockly.Blocks.change_brush_color_effect = {init:function() {
   this.setColour(categoryColor);
@@ -685,7 +694,12 @@ Blockly.Blocks.change_brush_color_effect = {init:function() {
   this.setNextStatement(!0);
 }};
 Entry.block.change_brush_color_effect = function(a, b) {
-  return script.callReturn();
+  var c = b.getNumberValue("VALUE", b);
+  a.brush || (Entry.setBasicBrush(a), a.brush.stop = !0);
+  a.brush.effect || (a.brush.effect = 0);
+  a.brush.effect += c;
+  a.brush && (a.brush.endStroke(), c = Entry.getMatrixValue(a.brush.effect), c = Entry.calcColorMatrix(a.brush.rgb, c), a.brush.beginStroke("rgba(" + c.r + "," + c.g + "," + c.b + "," + a.brush.opacity / 100 + ")"), a.brush.moveTo(a.getX(), -1 * a.getY()));
+  return b.callReturn();
 };
 var calcArrowColor = "#e8b349", calcBlockColor = "#FFD974", calcFontColor = "#3D3D3D";
 Blockly.Blocks.number = {init:function() {
@@ -5460,10 +5474,7 @@ Entry.EntityObject.prototype.applyFilter = function() {
   e.adjustColor(0, 0, 0, b.hue);
   e = new createjs.ColorMatrixFilter(e);
   c.push(e);
-  var e = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], f = 10.8 * b.hsv * Math.PI / 180, h = Math.cos(f), f = Math.sin(f), g = Math.abs(b.hsv / 100);
-  1 < g && (g -= Math.floor(g));
-  0 < g && .33 >= g ? e = [1, 0, 0, 0, 0, 0, h, f, 0, 0, 0, -1 * f, h, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1] : .66 >= g ? e = [h, 0, f, 0, 0, 0, 1, 0, 0, 0, f, 0, h, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1] : .99 >= g && (e = [h, f, 0, 0, 0, -1 * f, h, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
-  e = (new createjs.ColorMatrix).concat(e);
+  e = (new createjs.ColorMatrix).concat(Entry.getMatrixValue(b.hsv));
   e = new createjs.ColorMatrixFilter(e);
   c.push(e);
   a.alpha = b.alpha = d(b.alpha, 0, 1);
@@ -5472,6 +5483,14 @@ Entry.EntityObject.prototype.applyFilter = function() {
 };
 Entry.EntityObject.prototype.resetFilter = function() {
   "sprite" == this.parent.objectType && (this.object.filters = [], this.setInitialEffectValue(), this.object.alpha = this.effect.alpha, this.object.cache(0, 0, this.getWidth(), this.getHeight()));
+};
+Entry.EntityObject.prototype.applyBrushFilter = function() {
+  var a = this.shape, b = this.brush.effect;
+  console.log("effect amount = " + b);
+  b = Entry.getMatrixValue(b);
+  b = (new createjs.ColorMatrix).concat(b);
+  a.filters = [new createjs.ColorMatrixFilter(b)];
+  a.cache(0, 0, this.getWidth(), this.getHeight());
 };
 Entry.EntityObject.prototype.updateDialog = function() {
   this.dialog && this.dialog.update();
@@ -10016,6 +10035,20 @@ Entry.isEmpty = function(a) {
     }
   }
   return !0;
+};
+Entry.getMatrixValue = function(a) {
+  var b = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1], c = 10.8 * a * Math.PI / 180, d = Math.cos(c), c = Math.sin(c);
+  a = Math.abs(a / 100);
+  1 < a && (a -= Math.floor(a));
+  0 < a && .33 >= a ? b = [1, 0, 0, 0, 0, 0, d, c, 0, 0, 0, -1 * c, d, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1] : .66 >= a ? b = [d, 0, c, 0, 0, 0, 1, 0, 0, 0, c, 0, d, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1] : .99 >= a && (b = [d, c, 0, 0, 0, -1 * c, d, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
+  return b;
+};
+Entry.calcColorMatrix = function(a, b) {
+  var c = a.r, d = a.g, e = a.b, f, h;
+  f = c * b[0] + d * b[5] + e * b[10] + b[15];
+  h = c * b[1] + d * b[6] + e * b[11] + b[16];
+  c = c * b[2] + d * b[7] + e * b[12] + b[17];
+  return {r:Math.round(Math.abs(f)), g:Math.round(Math.abs(h)), b:Math.round(Math.abs(c))};
 };
 Entry.Func = function() {
   this.id = Entry.generateHash();
