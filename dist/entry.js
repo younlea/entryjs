@@ -13939,7 +13939,7 @@ Entry.BlockView = function(a, b, c) {
             g = this._getCloseBlock();
             if (a || g) {
               if (g) {
-                if (this.set({animating:!0}), g.next && g.next.view.set({animating:!0}), e.doInsert(g), createjs.Sound.play("entryMagneting"), g instanceof Entry.FieldDummyBlock && (e = e.next)) {
+                if (this.set({animating:!0}), g.next && g.next.view.set({animating:!0}), e.doInsert(g), createjs.Sound.play("entryMagneting"), g.constructor == Entry.FieldDummyBlock && (e = e.next)) {
                   -1 < Entry.FieldDummyBlock.PRIMITIVE_TYPES.indexOf(e.type) ? (e.getThread().cut(e), e.destroy(!1)) : (e.separate(), e.view._moveBy(10, 10, !1));
                 }
               } else {
