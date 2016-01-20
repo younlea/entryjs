@@ -67,7 +67,7 @@
   background: url("../images/top_icon_add_b_nor.png");
 }
 .selectedScene .entrySceneLeftWorkspace {
-  background: url("../images/top_tab_b_sel_left.png");
+  background: no-repeat url("../images/top_tab_b_sel_left.png");
 }
 .entrySceneLeftWorkspace {
   display: inline-block;
