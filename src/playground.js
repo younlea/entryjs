@@ -1609,6 +1609,13 @@ Entry.Playground.prototype.generateSoundElement = function(sound) {
                     }
                     Entry.removeElement(element);
                 }
+            },
+            {
+                text: Lang.Workspace.context_download,
+                callback: function() {
+                    var filename = sound.name + sound.ext;
+                    window.open('/ws/down?path=' + sound.path + '&filename=' + filename );
+                }
             }
         ];
         Entry.ContextMenu.show(options, 'workspace-contextmenu');

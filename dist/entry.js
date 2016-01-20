@@ -9336,6 +9336,8 @@ Entry.Playground.prototype.generateSoundElement = function(a) {
     }}, {text:Lang.Workspace.context_remove, callback:function() {
       Entry.playground.object.removeSound(a.id) ? (Entry.removeElement(b), Entry.toast.success(Lang.Workspace.sound_remove_ok, a.name + " " + Lang.Workspace.sound_remove_ok_msg)) : Entry.toast.alert(Lang.Workspace.sound_remove_fail, "");
       Entry.removeElement(b);
+    }}, {text:Lang.Workspace.context_download, callback:function() {
+      window.open("/ws/down?path=" + a.path + "&filename=" + (a.name + a.ext));
     }}], "workspace-contextmenu");
   });
   var c = Entry.createElement("div");
