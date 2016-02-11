@@ -141,50 +141,43 @@ Entry.Scroller.RADIUS = 7;
             svgDom = this.board.svgDom,
             bWidth = svgDom.width(),
             bHeight = svgDom.height();
-        var visible = true;
-        //TODO visible setting needed only if overflow happens
-        //if (bBox.width > bWidth || bBox.height > bHeight)
-            //visible = true;
 
-        this.setVisible(visible);
+        // hScroll
+        if (this._horizontal) {
+            var hLimitA = - bBox.width + Entry.BOARD_PADDING,
+                hLimitB = bWidth - Entry.BOARD_PADDING;
 
-        if (visible) {
-            // hScroll
-            if (this._horizontal) {
-                var hLimitA = - bBox.width + Entry.BOARD_PADDING,
-                    hLimitB = bWidth - Entry.BOARD_PADDING;
+            var hWidth = (bWidth + 2 * Entry.Scroller.RADIUS) * bBox.width /
+                (hLimitB - hLimitA + bBox.width);
+            if (isNaN(hWidth)) hWidth = 0;
+            this.hX = (bBox.x - hLimitA) / (hLimitB - hLimitA) *
+                (bWidth - hWidth - 2 * Entry.Scroller.RADIUS);
+            this.hScrollbar.attr({
+                width: hWidth,
+                x: this.hX,
+                y: bHeight - 2 * Entry.Scroller.RADIUS
+            });
 
-                var hWidth = (bWidth + 2 * Entry.Scroller.RADIUS) * bBox.width /
-                    (hLimitB - hLimitA + bBox.width);
-                if (isNaN(hWidth)) hWidth = 0;
-                this.hX = (bBox.x - hLimitA) / (hLimitB - hLimitA) *
-                    (bWidth - hWidth - 2 * Entry.Scroller.RADIUS);
-                this.hScrollbar.attr({
-                    width: hWidth,
-                    x: this.hX,
-                    y: bHeight - 2 * Entry.Scroller.RADIUS
-                });
+            this.hRatio = (bWidth - hWidth - 2 * Entry.Scroller.RADIUS)/ (hLimitB - hLimitA);
+        }
 
-                this.hRatio = (bWidth - hWidth - 2 * Entry.Scroller.RADIUS)/ (hLimitB - hLimitA);
-            }
+        // vScroll
+        if (this._vertical) {
+            var vLimitA = - bBox.height + Entry.BOARD_PADDING,
+                vLimitB = bHeight - Entry.BOARD_PADDING;
 
-            // vScroll
-            if (this._vertical) {
-                var vLimitA = - bBox.height + Entry.BOARD_PADDING,
-                    vLimitB = bHeight - Entry.BOARD_PADDING;
+            var vWidth = (bHeight + 2 * Entry.Scroller.RADIUS) * bBox.height /
+                (vLimitB - vLimitA + bBox.height);
+            this.vY = (bBox.y - vLimitA) / (vLimitB - vLimitA) *
+                (bHeight - vWidth - 2 * Entry.Scroller.RADIUS);
+            this.vY = Math.max(this.vY, 0);
+            this.vScrollbar.attr({
+                height: vWidth,
+                y: this.vY,
+                x: bWidth - 2 * Entry.Scroller.RADIUS
+            });
 
-                var vWidth = (bHeight + 2 * Entry.Scroller.RADIUS) * bBox.height /
-                    (vLimitB - vLimitA + bBox.height);
-                this.vY = (bBox.y - vLimitA) / (vLimitB - vLimitA) *
-                    (bHeight - vWidth - 2 * Entry.Scroller.RADIUS);
-                this.vScrollbar.attr({
-                    height: vWidth,
-                    y: this.vY,
-                    x: bWidth - 2 * Entry.Scroller.RADIUS
-                });
-
-                this.vRatio = (bHeight - vWidth - 2 * Entry.Scroller.RADIUS)/ (vLimitB - vLimitA);
-            }
+            this.vRatio = (bHeight - vWidth - 2 * Entry.Scroller.RADIUS)/ (vLimitB - vLimitA);
         }
     };
 
@@ -198,6 +191,7 @@ Entry.Scroller.RADIUS = 7;
 
         if (this._vertical) {
             this.vY += dy * this.vRatio;
+            this.vY = Math.max(this.vY, 0);
             this.vScrollbar.attr({
                 y: this.vY
             });
@@ -220,7 +214,6 @@ Entry.Scroller.RADIUS = 7;
         );
         this.board.code.moveBy(x, y);
         this.updateScrollBar(x, y);
-        this.board.code.updateThreadsPos();
     };
 
     p.setVisible = function(visible) {
@@ -232,7 +225,5 @@ Entry.Scroller.RADIUS = 7;
 
     };
 
-    p.isVisible = function() {
-        return this._visible;
-    };
+    p.isVisible = function() {return this._visible;};
 })(Entry.Scroller.prototype);

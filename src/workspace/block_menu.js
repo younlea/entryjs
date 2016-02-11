@@ -13,7 +13,7 @@ goog.require("Entry.Utils");
 Entry.BlockMenu = function(dom, align, scroll) {
     Entry.Model(this, false);
     this._align = align || "CENTER";
-    scroll = scroll === true ? true : false;
+    this.scroll = scroll === true ? true : false;
 
     if (typeof dom === "string") dom = $('#' + dom);
     else dom = $(dom);
@@ -32,6 +32,7 @@ Entry.BlockMenu = function(dom, align, scroll) {
 
     this.offset = this.svgDom.offset();
     this._svgWidth = this.svgDom.width();
+    this._addControl(dom);
 
     this.snap = Snap('#blockMenu');
 
@@ -46,12 +47,16 @@ Entry.BlockMenu = function(dom, align, scroll) {
     this.changeEvent = new Entry.Event(this);
 
     //TODO scroller should be attached
-    if (scroll)
+    if (this.scroll)
         this.scroller = new Entry.Scroller(this, false, true);
 
     this.observe(this, "generateDragBlockObserver", ['dragBlock']);
     if (Entry.documentMousedown)
         Entry.documentMousedown.attach(this, this.setSelectedBlock);
+
+    this.changeEvent.attach(this, this._checkScroll);
+    if (Entry.windowResized)
+        Entry.windowResized.attach(this, this._checkScroll);
 };
 
 (function(p) {
@@ -282,6 +287,79 @@ Entry.BlockMenu = function(dom, align, scroll) {
         } else blockView = null;
 
         this.set({selectedBlockView:blockView});
+    };
+
+    p._checkScroll = function() {
+        if (!this.scroller) return;
+        var svgHeight = this.svgGroup.getBBox().height;
+        var domHeight = this.svgDom.height();
+        var overflow;
+
+        if (svgHeight > domHeight) overflow = true;
+        else overflow = false;
+
+        if (this.scroll === overflow) return;
+
+        this.scroll = overflow;
+        this.scroller.setVisible(overflow);
+    };
+
+    p._addControl = function(dom) {
+        var that = this;
+        dom.mousedown(function() {
+            that.onMouseDown.apply(that, arguments);
+        });
+        dom.bind('touchstart', function() {
+            that.onMouseDown.apply(that, arguments);
+        });
+        //dom.on('mousewheel', function(){
+            //that.mouseWheel.apply(that, arguments);
+        //});
+    };
+
+    p.onMouseDown = function(e) {
+        if (!this.scroll) return;
+        if (e.originalEvent.touches)
+            e = e.originalEvent.touches[0];
+
+        if (e.button === 0 || e instanceof Touch) {
+            if (Entry.documentMousedown)
+                Entry.documentMousedown.notify(e);
+            var doc = $(document);
+            doc.bind('mousemove.entryBoard', onMouseMove);
+            doc.bind('mouseup.entryBoard', onMouseUp);
+            doc.bind('touchmove.entryBoard', onMouseMove);
+            doc.bind('touchend.entryBoard', onMouseUp);
+            this.dragInstance = new Entry.DragInstance({
+                startX: e.pageX,
+                startY: e.pageY,
+                offsetX: e.pageX,
+                offsetY: e.pageY
+            });
+        }
+
+        var board = this;
+        function onMouseMove(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            if (e.originalEvent.touches) {
+                e = e.originalEvent.touches[0];
+            }
+            var dragInstance = board.dragInstance;
+            board.scroller.scroll(
+                0, e.pageY - dragInstance.offsetY
+            );
+            dragInstance.set({
+                offsetY: e.pageY
+            });
+        }
+
+        function onMouseUp(e) {
+            $(document).unbind('.entryBoard');
+            delete board.dragInstance;
+        }
+        if (e.stopPropagation) e.stopPropagation();
     };
 
 })(Entry.BlockMenu.prototype);

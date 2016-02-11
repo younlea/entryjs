@@ -149,21 +149,14 @@ Entry.Code = function(code) {
         var threads = this.getThreads();
         for (var i=0, len=threads.length; i<len; i++) {
             var firstBlock = threads[i].getFirstBlock();
-            if (firstBlock)
+            if (firstBlock) {
                 firstBlock.view._moveBy(x, y, false);
+                firstBlock._updatePos();
+            }
         }
     };
 
     p.stringify = function() {
         return JSON.stringify(this.toJSON());
     };
-
-    p.updateThreadsPos = function() {
-        var threads = this.getThreads();
-        for (var i=0; i<threads.length; i++) {
-            var block = threads[i].getFirstBlock();
-            if (block) block._updatePos();
-        }
-    };
-
 })(Entry.Code.prototype);

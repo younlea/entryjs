@@ -13398,7 +13398,7 @@ Entry.block.jr_if_speed = {skeleton:"basic_loop", color:"#498DEB", contents:["\u
 Entry.BlockMenu = function(a, b, c) {
   Entry.Model(this, !1);
   this._align = b || "CENTER";
-  c = !0 === c ? !0 : !1;
+  this.scroll = !0 === c ? !0 : !1;
   a = "string" === typeof a ? $("#" + a) : $(a);
   if ("DIV" !== a.prop("tagName")) {
     return console.error("Dom is not div element");
@@ -13409,6 +13409,7 @@ Entry.BlockMenu = function(a, b, c) {
   this.svgDom = Entry.Dom($('<svg id="blockMenu" width="100%" height="100%"version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>'), {parent:a});
   this.offset = this.svgDom.offset();
   this._svgWidth = this.svgDom.width();
+  this._addControl(a);
   this.snap = Snap("#blockMenu");
   this.svgGroup = this.snap.group();
   this.svgThreadGroup = this.svgGroup.group();
@@ -13416,9 +13417,11 @@ Entry.BlockMenu = function(a, b, c) {
   this.svgBlockGroup = this.svgGroup.group();
   this.svgBlockGroup.board = this;
   this.changeEvent = new Entry.Event(this);
-  c && (this.scroller = new Entry.Scroller(this, !1, !0));
+  this.scroll && (this.scroller = new Entry.Scroller(this, !1, !0));
   this.observe(this, "generateDragBlockObserver", ["dragBlock"]);
   Entry.documentMousedown && Entry.documentMousedown.attach(this, this.setSelectedBlock);
+  this.changeEvent.attach(this, this._checkScroll);
+  Entry.windowResized && Entry.windowResized.attach(this, this._checkScroll);
 };
 (function(a) {
   a.schema = {code:null, dragBlock:null, closeBlock:null, selectedBlockView:null};
@@ -13519,6 +13522,49 @@ Entry.BlockMenu = function(a, b, c) {
     c && c.removeSelected();
     a instanceof Entry.BlockView ? a.addSelected() : a = null;
     this.set({selectedBlockView:a});
+  };
+  a._checkScroll = function() {
+    if (this.scroller) {
+      var a = this.svgGroup.getBBox().height, c = this.svgDom.height(), a = a > c ? !0 : !1;
+      this.scroll !== a && (this.scroll = a, this.scroller.setVisible(a));
+    }
+  };
+  a._addControl = function(a) {
+    var c = this;
+    a.mousedown(function() {
+      c.onMouseDown.apply(c, arguments);
+    });
+    a.bind("touchstart", function() {
+      c.onMouseDown.apply(c, arguments);
+    });
+  };
+  a.onMouseDown = function(a) {
+    function c(a) {
+      a.stopPropagation();
+      a.preventDefault();
+      a.originalEvent.touches && (a = a.originalEvent.touches[0]);
+      var b = f.dragInstance;
+      f.scroller.scroll(0, a.pageY - b.offsetY);
+      b.set({offsetY:a.pageY});
+    }
+    function d(a) {
+      $(document).unbind(".entryBoard");
+      delete f.dragInstance;
+    }
+    if (this.scroll) {
+      a.originalEvent.touches && (a = a.originalEvent.touches[0]);
+      if (0 === a.button || a instanceof Touch) {
+        Entry.documentMousedown && Entry.documentMousedown.notify(a);
+        var e = $(document);
+        e.bind("mousemove.entryBoard", c);
+        e.bind("mouseup.entryBoard", d);
+        e.bind("touchmove.entryBoard", c);
+        e.bind("touchend.entryBoard", d);
+        this.dragInstance = new Entry.DragInstance({startX:a.pageX, startY:a.pageY, offsetX:a.pageX, offsetY:a.pageY});
+      }
+      var f = this;
+      a.stopPropagation && a.stopPropagation();
+    }
   };
 })(Entry.BlockMenu.prototype);
 Entry.BlockView = function(a, b) {
@@ -13900,17 +13946,11 @@ Entry.Code = function(a) {
   a.moveBy = function(a, c) {
     for (var d = this.getThreads(), e = 0, f = d.length;e < f;e++) {
       var g = d[e].getFirstBlock();
-      g && g.view._moveBy(a, c, !1);
+      g && (g.view._moveBy(a, c, !1), g._updatePos());
     }
   };
   a.stringify = function() {
     return JSON.stringify(this.toJSON());
-  };
-  a.updateThreadsPos = function() {
-    for (var a = this.getThreads(), c = 0;c < a.length;c++) {
-      var d = a[c].getFirstBlock();
-      d && d._updatePos();
-    }
   };
 })(Entry.Code.prototype);
 Entry.CodeView = function(a, b) {
@@ -13972,6 +14012,7 @@ Entry.FieldDropdown = function(a, b) {
     this.svgGroup.append(this.textElement);
     this._arrow = this.svgGroup.polygon(0, -2, 6, -2, 3, 2).attr({fill:"#127cbd", stroke:"#127cbd", transform:"t" + (a - 11) + " 0"});
     this.svgGroup.mouseup(function(a) {
+      console.log(2323);
       c._block.view.dragMode == Entry.DRAG_MODE_MOUSEDOWN && c.renderOptions();
     });
     this.box.set({x:0, y:0, width:a, height:23});
@@ -14306,7 +14347,6 @@ Entry.Scroller.RADIUS = 7;
   };
   a.resizeScrollBar = function() {
     var a = this.board.svgBlockGroup.getBBox(), c = this.board.svgDom, d = c.width(), c = c.height();
-    this.setVisible(!0);
     if (this._horizontal) {
       var e = -a.width + Entry.BOARD_PADDING, f = d - Entry.BOARD_PADDING, g = (d + 2 * Entry.Scroller.RADIUS) * a.width / (f - e + a.width);
       isNaN(g) && (g = 0);
@@ -14314,11 +14354,11 @@ Entry.Scroller.RADIUS = 7;
       this.hScrollbar.attr({width:g, x:this.hX, y:c - 2 * Entry.Scroller.RADIUS});
       this.hRatio = (d - g - 2 * Entry.Scroller.RADIUS) / (f - e);
     }
-    this._vertical && (e = -a.height + Entry.BOARD_PADDING, f = c - Entry.BOARD_PADDING, g = (c + 2 * Entry.Scroller.RADIUS) * a.height / (f - e + a.height), this.vY = (a.y - e) / (f - e) * (c - g - 2 * Entry.Scroller.RADIUS), this.vScrollbar.attr({height:g, y:this.vY, x:d - 2 * Entry.Scroller.RADIUS}), this.vRatio = (c - g - 2 * Entry.Scroller.RADIUS) / (f - e));
+    this._vertical && (e = -a.height + Entry.BOARD_PADDING, f = c - Entry.BOARD_PADDING, g = (c + 2 * Entry.Scroller.RADIUS) * a.height / (f - e + a.height), this.vY = (a.y - e) / (f - e) * (c - g - 2 * Entry.Scroller.RADIUS), this.vY = Math.max(this.vY, 0), this.vScrollbar.attr({height:g, y:this.vY, x:d - 2 * Entry.Scroller.RADIUS}), this.vRatio = (c - g - 2 * Entry.Scroller.RADIUS) / (f - e));
   };
   a.updateScrollBar = function(a, c) {
     this._horizontal && (this.hX += a * this.hRatio, this.hScrollbar.attr({x:this.hX}));
-    this._vertical && (this.vY += c * this.vRatio, this.vScrollbar.attr({y:this.vY}));
+    this._vertical && (this.vY += c * this.vRatio, this.vY = Math.max(this.vY, 0), this.vScrollbar.attr({y:this.vY}));
   };
   a.scroll = function(a, c) {
     var d = this.board.svgBlockGroup.getBBox(), e = this.board.svgDom;
@@ -14328,7 +14368,6 @@ Entry.Scroller.RADIUS = 7;
     c = Math.min(e.height() - Entry.BOARD_PADDING - d.y, c);
     this.board.code.moveBy(a, c);
     this.updateScrollBar(a, c);
-    this.board.code.updateThreadsPos();
   };
   a.setVisible = function(a) {
     a != this.isVisible() && (this._visible = a, this.svgGroup.attr({display:!0 === a ? "block" : "none"}));
