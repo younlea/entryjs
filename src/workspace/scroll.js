@@ -220,6 +220,7 @@ Entry.Scroller.RADIUS = 7;
         );
         this.board.code.moveBy(x, y);
         this.updateScrollBar(x, y);
+        this.board.code.updateThreadsPos();
     };
 
     p.setVisible = function(visible) {

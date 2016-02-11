@@ -158,4 +158,12 @@ Entry.Code = function(code) {
         return JSON.stringify(this.toJSON());
     };
 
+    p.updateThreadsPos = function() {
+        var threads = this.getThreads();
+        for (var i=0; i<threads.length; i++) {
+            var block = threads[i].getFirstBlock();
+            if (block) block._updatePos();
+        }
+    };
+
 })(Entry.Code.prototype);

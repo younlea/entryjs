@@ -13395,9 +13395,10 @@ Entry.block.jr_if_speed = {skeleton:"basic_loop", color:"#498DEB", contents:["\u
     }
   }
 }};
-Entry.BlockMenu = function(a, b) {
+Entry.BlockMenu = function(a, b, c) {
   Entry.Model(this, !1);
   this._align = b || "CENTER";
+  c = !0 === c ? !0 : !1;
   a = "string" === typeof a ? $("#" + a) : $(a);
   if ("DIV" !== a.prop("tagName")) {
     return console.error("Dom is not div element");
@@ -13415,6 +13416,7 @@ Entry.BlockMenu = function(a, b) {
   this.svgBlockGroup = this.svgGroup.group();
   this.svgBlockGroup.board = this;
   this.changeEvent = new Entry.Event(this);
+  c && (this.scroller = new Entry.Scroller(this, !1, !0));
   this.observe(this, "generateDragBlockObserver", ["dragBlock"]);
   Entry.documentMousedown && Entry.documentMousedown.attach(this, this.setSelectedBlock);
 };
@@ -13904,6 +13906,12 @@ Entry.Code = function(a) {
   a.stringify = function() {
     return JSON.stringify(this.toJSON());
   };
+  a.updateThreadsPos = function() {
+    for (var a = this.getThreads(), c = 0;c < a.length;c++) {
+      var d = a[c].getFirstBlock();
+      d && d._updatePos();
+    }
+  };
 })(Entry.Code.prototype);
 Entry.CodeView = function(a, b) {
   Entry.Model(this, !1);
@@ -14320,6 +14328,7 @@ Entry.Scroller.RADIUS = 7;
     c = Math.min(e.height() - Entry.BOARD_PADDING - d.y, c);
     this.board.code.moveBy(a, c);
     this.updateScrollBar(a, c);
+    this.board.code.updateThreadsPos();
   };
   a.setVisible = function(a) {
     a != this.isVisible() && (this._visible = a, this.svgGroup.attr({display:!0 === a ? "block" : "none"}));

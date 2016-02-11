@@ -10,9 +10,10 @@ goog.require("Entry.Utils");
  *
  * @param {object} dom which to inject playground
  */
-Entry.BlockMenu = function(dom, align) {
+Entry.BlockMenu = function(dom, align, scroll) {
     Entry.Model(this, false);
     this._align = align || "CENTER";
+    scroll = scroll === true ? true : false;
 
     if (typeof dom === "string") dom = $('#' + dom);
     else dom = $(dom);
@@ -43,8 +44,10 @@ Entry.BlockMenu = function(dom, align) {
     this.svgBlockGroup.board = this;
 
     this.changeEvent = new Entry.Event(this);
+
     //TODO scroller should be attached
-    //this.scroller = new Entry.Scroller(this, false, true);
+    if (scroll)
+        this.scroller = new Entry.Scroller(this, false, true);
 
     this.observe(this, "generateDragBlockObserver", ['dragBlock']);
     if (Entry.documentMousedown)
