@@ -10759,7 +10759,8 @@ Entry.Utils.bindGlobalEvent = function(a) {
   !Entry.documentMousedown && -1 < a.indexOf("mousedown") && (Entry.documentMousedown = new Entry.Event(window), $(document).on("mousedown", function(a) {
     Entry.documentMousedown.notify(a);
   }));
-  !Entry.documentMousemove && -1 < a.indexOf("mousemove") && (Entry.mouseCoordinate = {}, Entry.documentMousemove = new Entry.Event(window), $(document).on("mousemove", function(a) {
+  !Entry.documentMousemove && -1 < a.indexOf("mousemove") && (Entry.mouseCoordinate = {}, Entry.documentMousemove = new Entry.Event(window), $(document).on("mousemove touchmove", function(a) {
+    a.originalEvent && a.originalEvent.touches && (a = a.originalEvent.touches[0]);
     Entry.documentMousemove.notify(a);
     Entry.mouseCoordinate.x = a.clientX;
     Entry.mouseCoordinate.y = a.clientY;
@@ -14701,9 +14702,7 @@ Entry.FieldTrashcan = function(a) {
       if (a = a.dragInstance) {
         f = a.offsetX, g = a.offsetY;
       }
-      e = f >= e && g >= c;
-      console.log(e);
-      this.tAnimation(e);
+      this.tAnimation(f >= e && g >= c);
     }
   };
   a.align = function() {
@@ -14848,7 +14847,7 @@ Entry.Board = function(a) {
       this.dragInstance = new Entry.DragInstance({startX:a.pageX, startY:a.pageY, offsetX:a.pageX, offsetY:a.pageY});
     }
     var f = this;
-    a.stopPropagation();
+    a.stopPropagation && a.stopPropagation();
   };
   a.mouseWheel = function(a) {
     a = a.originalEvent;

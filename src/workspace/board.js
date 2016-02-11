@@ -202,7 +202,7 @@ Entry.Board = function(dom) {
             $(document).unbind('.entryBoard');
             delete board.dragInstance;
         }
-        e.stopPropagation();
+        if (e.stopPropagation) e.stopPropagation();
     };
 
     p.mouseWheel = function(e) {
