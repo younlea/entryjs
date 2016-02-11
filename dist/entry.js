@@ -13463,7 +13463,7 @@ Entry.BlockMenu = function(a, b) {
       this.dragBlockObserver && this.removeDragBlockObserver();
       var c = this._svgWidth, d = this.dragBlock, e = d.block, f = this.code, g = e.getThread();
       e && g && (f.cloneThread(g), a && d.observe(this, "moveBoardBlock", ["x", "y"], !1), d.dominate(), a = this.workspace.getBoard(), this._boardBlockView = a.code.cloneThread(g).getFirstBlock().view, this._boardBlockView.dragInstance = new Entry.DragInstance({height:0, isNew:!0}), a.set({dragBlock:this._boardBlockView}), a.setSelectedBlock(this._boardBlockView), this._boardBlockView.addDragging(), this._boardBlockView.dragMode = Entry.DRAG_MODE_MOUSEDOWN, this._boardBlockView._moveTo(d.x - c, 
-      d.y - 0, !1));
+      d.y, !1));
       if (this._boardBlockView) {
         return this._boardBlockView.block.id;
       }
@@ -13621,6 +13621,9 @@ Entry.BlockView = function(a, b) {
   };
   a._addControl = function() {
     var a = this;
+    this.svgGroup.touchstart(function() {
+      a.onMouseDown.apply(a, arguments);
+    });
     this.svgGroup.mousedown(function() {
       a.onMouseDown.apply(a, arguments);
     });
@@ -13657,7 +13660,8 @@ Entry.BlockView = function(a, b) {
     Entry.documentMousedown && Entry.documentMousedown.notify();
     this.getBoard().setSelectedBlock(this);
     this.dominate();
-    if (0 === a.button || a instanceof Touch) {
+    if (0 === a.button || a instanceof Touch || a instanceof TouchEvent) {
+      a.touches && (a = a.touches[0]);
       this.mouseDownCoordinate = {x:a.pageX, y:a.pageY};
       var e = $(document);
       e.bind("mousemove.block", c);
@@ -13691,7 +13695,7 @@ Entry.BlockView = function(a, b) {
       }
     }
     var k = this, l = this.getBoard();
-    a.stopPropagation();
+    a.stopPropagation && a.stopPropagation();
   };
   a.terminateDrag = function() {
     var a = this.getBoard(), c = this.dragMode, d = this.block;
@@ -14697,7 +14701,9 @@ Entry.FieldTrashcan = function(a) {
       if (a = a.dragInstance) {
         f = a.offsetX, g = a.offsetY;
       }
-      this.tAnimation(f >= e && g >= c);
+      e = f >= e && g >= c;
+      console.log(e);
+      this.tAnimation(e);
     }
   };
   a.align = function() {
@@ -14740,7 +14746,6 @@ Entry.Board = function(a) {
   Entry.Model(this, !1);
   this.svgDom = Entry.Dom($('<svg id="play" class="entryBoard" width="100%" height="100%"version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>'), {parent:a});
   this.offset = this.svgDom.offset();
-  this.offset.top = 130;
   this.offset.left -= $(window).scrollLeft();
   this.relativeOffset = this.offset;
   var c = this;

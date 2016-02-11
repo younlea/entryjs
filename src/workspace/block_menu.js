@@ -161,9 +161,11 @@ Entry.BlockMenu = function(dom, align) {
                 this._boardBlockView.addDragging();
                 this._boardBlockView.dragMode = Entry.DRAG_MODE_MOUSEDOWN;
 
+                //var topDiff =
+                    //workspaceBoard.svgDom.offset().top - this.svgDom.offset().top;
                 this._boardBlockView._moveTo(
                     blockView.x-svgWidth,
-                    blockView.y-0,
+                    blockView.y,
                     false
                 );
         }
@@ -220,10 +222,12 @@ Entry.BlockMenu = function(dom, align) {
         var instance = boardBlockView.dragInstance;
 
         var mouse = Entry.mouseCoordinate;
+
         instance.set({
             offsetX: mouse.x,
             offsetY: mouse.y
         });
+
         if (instance.height === 0) {
             var block = boardBlockView.block;
             var height = 0;
@@ -248,8 +252,7 @@ Entry.BlockMenu = function(dom, align) {
         }
     };
 
-    p.setMagnetedBlock = function() {
-    };
+    p.setMagnetedBlock = function() {};
 
     p.findById = function(id) {
         var code = this.code;

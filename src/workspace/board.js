@@ -37,7 +37,6 @@ Entry.Board = function(dom) {
 
     var zoom = document.documentElement.clientWidth / window.innerWidth;
     this.offset = this.svgDom.offset();
-    this.offset.top = 130;
     this.offset.left -= $(window).scrollLeft();
     this.relativeOffset = this.offset;
     var that = this;

@@ -228,6 +228,9 @@ Entry.BlockView = function(block, board) {
 
     p._addControl = function() {
         var that = this;
+        this.svgGroup.touchstart(function() {
+            that.onMouseDown.apply(that, arguments);
+        });
         this.svgGroup.mousedown(function() {
             that.onMouseDown.apply(that, arguments);
         });
@@ -240,7 +243,8 @@ Entry.BlockView = function(block, board) {
             Entry.documentMousedown.notify();
         this.getBoard().setSelectedBlock(this);
         this.dominate();
-        if (e.button === 0 || e instanceof Touch) {
+        if (e.button === 0 || e instanceof Touch || e instanceof TouchEvent) {
+            if (e.touches) e = e.touches[0];
             this.mouseDownCoordinate = {
                 x: e.pageX, y: e.pageY
             };
@@ -365,7 +369,7 @@ Entry.BlockView = function(block, board) {
             if (board) board.set({dragBlock: null});
             delete blockView.dragInstance;
         }
-        e.stopPropagation();
+        if (e.stopPropagation) e.stopPropagation();
     };
 
     p.terminateDrag = function() {
