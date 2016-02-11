@@ -14702,7 +14702,7 @@ Entry.FieldTrashcan = function(a) {
       if (a = a.dragInstance) {
         f = a.offsetX, g = a.offsetY;
       }
-      this.tAnimation(f >= e && g >= c);
+      this.tAnimation(!this.board.magnetedBlockView && f >= e && g >= c);
     }
   };
   a.align = function() {

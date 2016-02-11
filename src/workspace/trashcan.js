@@ -63,8 +63,8 @@ Entry.FieldTrashcan = function(board) {
             mouseX = instance.offsetX;
             mouseY = instance.offsetY;
         }
-        var isOver = mouseX >= trashcanX &&
-            mouseY >= trashcanY;
+        var isOver = !this.board.magnetedBlockView &&
+                    mouseX >= trashcanX && mouseY >= trashcanY;
         this.tAnimation(isOver);
     };
 
