@@ -14012,7 +14012,6 @@ Entry.FieldDropdown = function(a, b) {
     this.svgGroup.append(this.textElement);
     this._arrow = this.svgGroup.polygon(0, -2, 6, -2, 3, 2).attr({fill:"#127cbd", stroke:"#127cbd", transform:"t" + (a - 11) + " 0"});
     this.svgGroup.mouseup(function(a) {
-      console.log(2323);
       c._block.view.dragMode == Entry.DRAG_MODE_MOUSEDOWN && c.renderOptions();
     });
     this.box.set({x:0, y:0, width:a, height:23});
