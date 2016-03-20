@@ -250,6 +250,26 @@ EntryStatic.getAllBlocks = function() {
                 "bitbrick_dc_speed",
                 "bitbrick_dc_direction_speed",
                 "bitbrick_servomotor_angle",
+
+                "cobl_read_ultrason",
+                "cobl_read_potenmeter",
+                "cobl_read_irread1",
+                "cobl_read_irread2",
+                "cobl_read_joyx",
+                "cobl_read_joyy",
+                "cobl_read_sens1",
+                "cobl_read_sens2",
+                "cobl_read_tilt",
+                "cobl_read_temps",
+                "cobl_read_light",
+                "cobl_read_btn",
+                "cobl_led_control",
+                "cobl_servo_angle_control",
+                "cobl_melody",
+                "cobl_dcmotor",
+                "cobl_extention_port",
+                "cobl_external_led",
+                "cobl_7_segment",
 				"hamster_hand_found",
                 "hamster_value",
 				"hamster_move_forward_once",
@@ -1420,6 +1440,112 @@ EntryStatic.blockInfo = {
         "isNotFor": ['bitbrick'],
         "xml": "<block type='bitbrick_convert_scale'><value name='VALUE2'> <block type='number'><field name='NUM'>0</field></block> </value><value name='VALUE3'> <block type='number'><field name='NUM'>1023</field></block> </value><value name='VALUE4'> <block type='number'><field name='NUM'>-100</field></block> </value><value name='VALUE5'> <block type='number'><field name='NUM'>100</field></block> </value></block>",
         "class": "condition"
+    },
+    "cobl_read_ultrason":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_ultrason'></block>",
+        "class": "condition"
+    },
+
+    "cobl_read_potenmeter":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_potenmeter'></block>",
+        "class": "condition"
+    },
+    "cobl_read_irread1":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_irread1'></block>",
+        "class": "condition"
+    },
+    "cobl_read_irread2":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_irread2'></block>",
+        "class": "condition"
+    },
+    "cobl_read_joyx":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_joyx'></block>",
+        "class": "condition"
+    },
+    "cobl_read_joyy":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_joyy'></block>",
+        "class": "condition"
+    },
+    "cobl_read_sens1":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_sens1'></block>",
+        "class": "condition"
+    },
+    "cobl_read_sens2":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_sens2'></block>",
+        "class": "condition"
+    },
+    "cobl_read_tilt":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_tilt'></block>",
+        "class": "condition"
+    },
+    "cobl_read_temps":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_temps'><value name='VALUE'><block type='cobl_get_port_number'></block></value></block>",
+        "usage": ["cobl"],
+        "class": "cobl_value"
+    },
+    "cobl_read_light":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_light'><value name='VALUE'><block type='cobl_get_port_number'></block></value></block>",
+        "usage": ["cobl"],
+        "class": "cobl_value"
+    },
+    "cobl_read_btn":{
+        "isNotFor": ['cobl'],
+        "xml": "<block type='cobl_read_btn'><value name='VALUE'><block type='cobl_get_port_number'></block></value></block>",
+        "usage": ["cobl"],
+        "class": "cobl_value"
+    },
+    "cobl_led_control": {
+        "xml": "<block type='cobl_led_control'></block>",
+        "isNotFor": ['cobl'],
+        "usage": ["cobl"],
+        "class": "cobl_set"
+    },
+    "cobl_servo_angle_control": {
+        "xml": "<block type='cobl_servo_angle_control'><value name='PORT'><block type='cobl_get_port_number'></block></value><value name='VALUE'><block type='cobl_text'><field name='NAME'>90</field></block></value></block>",
+        "isNotFor": ['cobl'],
+        "usage": ["cobl"],
+        "class": "cobl_set"
+    },
+    "cobl_melody": {
+        "xml": "<block type='cobl_melody'></block>",
+        "isNotFor": ['cobl'],
+        "usage": ["cobl"],
+        "class": "cobl_set"
+    },
+    "cobl_dcmotor": {
+        "xml": "<block type='cobl_dcmotor'></block>",
+        "isNotFor": ['cobl'],
+        "usage": ["cobl"],
+        "class": "cobl_set"
+    },
+    "cobl_extention_port": {
+        "xml": "<block type='cobl_extention_port'></block>",
+        "isNotFor": ['cobl'],
+        "usage": ["cobl"],
+        "class": "cobl_set"
+    },
+    "cobl_external_led": {
+        "xml": "<block type='cobl_external_led'><value name='LED'><block type='cobl_text'><field name='NAME'>1</field></block></value></block>",
+        "isNotFor": ['cobl'],
+        "usage": ["cobl"],
+        "class": "cobl_set"
+    },
+    "cobl_7_segment": {
+        "xml": "<block type='cobl_7_segment'><value name='VALUE'><block type='cobl_text'><field name='NAME'>7777</field></block></value></block>",
+        "isNotFor": ['cobl'],
+        "usage": ["cobl"],
+        "class": "cobl_set"
     },
 	"hamster_hand_found": {
         "isNotFor": ["hamster"],

@@ -31,6 +31,7 @@ Entry.HW = function() {
         '11': Entry.Arduino,
         '12': Entry.SensorBoard,
         '13': Entry.CODEino,
+        '14': Entry.Cobl,        
         '24': Entry.Hamster,
         '25': Entry.Albert,
         '31': Entry.Bitbrick
@@ -64,6 +65,7 @@ p.initSocket = function() {
     socket.onmessage = function (evt)
     {
         var data = JSON.parse(evt.data);
+     //   console.log(evt.data);
         hw.checkDevice(data);
         hw.updatePortData(data);
     };
@@ -95,7 +97,7 @@ p.setDigitalPortValue = function(port, value) {
 p.getAnalogPortValue = function(port) {
     if (!this.connected)
         return 0;
-    return this.portData['a'+port];
+    return this.portData[port];
 };
 
 p.getDigitalPortValue = function(port) {
